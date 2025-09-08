@@ -86,6 +86,20 @@ threshold <- 45:85 #Thresholds from 45 to 85 miles per hour
 
 mixed_variance <- numeric(length(threshold))
 
+t <- 60 #Initial threshold
+
+left_set <- speeds[speeds <= t]
+right_set <- speeds[speeds > t]
+
+Wleft <- length(left_set) / length(speeds)
+Wright <- 1 - Wleft
+
+print(Wleft)
+print(Wright)
+
+
+
+
 #print(mixed_variance)
 
 #Now we got mixed variance of two sets versus threshold
