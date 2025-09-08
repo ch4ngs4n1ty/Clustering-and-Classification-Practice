@@ -60,7 +60,7 @@ ylab = "Fraction within 1 sigma dev"
 
 main_folder <- "/Users/ch4ngs4n1ty/CSCI 420/HW 1/TRAFFIC_STATIONS_2251"
 
-idx <- sprintf("%02d", 1:32)   # "01", "02", ..., "20"
+idx <- sprintf("%02d", 1:32)  
 
 subs <- file.path(main_folder, paste0("TrafficStation_2251_", idx))
 
@@ -79,29 +79,60 @@ head(data_all)
 # show structure (types of each column)
 str(data_all)
 
-speeds <- round(data_all$SPEED) #Quantitize speed data to nearest one mile per hour
+all_speeds <- round(data_all$SPEED) #Quantitize speed data to nearest one mile per hour
 #intents <- data_all$INTENT
 
 threshold <- 45:85 #Thresholds from 45 to 85 miles per hour
 
-mixed_variance <- numeric(length(threshold))
+mixed_variance <- numeric(length(threshold)) #Purpose of this is to create mixed variance vectors of all 45 - 85 thresholds
 
-t <- 60 #Initial threshold
+for (i in seq_along(threshold)) {
 
-left_set <- speeds[speeds <= t]
-right_set <- speeds[speeds > t]
+    t <- threshold[i] #Current threshold
 
-Wleft <- length(left_set) / length(speeds)
-Wright <- 1 - Wleft
+    left_set <- all_speeds[all_speeds <= t] #Vectors of left set
+    right_set <- all_speeds[all_speeds > t] #Vectors of right set
 
-print(Wleft)
-print(Wright)
+    W_L <- length(left_set) / length(all_speeds)  #Formula: W_L = abs(left_set) / abs(speeds)
+    W_R <- 1 - W_L #Remainder of left set. Formula: W_R = 1 - W_L
+
+    if (length(left_set) >= 2) { #sigma_L2 = var(left_set)
+        sigma_L2 <- var(left_set)
+    } else {
+        sigma_L2 <- 0
+    }
+
+    if (length(right_set) >= 2) { #sigma_R2 = var(right_set)
+        sigma_R2 <- var(right_set)
+    } else {
+        sigma_R2 <- 0
+    }
+    mv_nround <- W_L * sigma_L2 + W_R * sigma_R2 #Formula: mixed_variance = W_L * sigma_L2 + W_R * sigma_R2
+    mixed_variance[i] = round(mv_nround * 10) / 10 #Round to nearest tenth and remove noise
+}
+
+range(all_speeds)
+all_x <- min(all_speeds):max(all_speeds)
+
+plot(threshold, mixed_variance,
+     main = "Mixed Variance vs Threshold",
+     type = "l",
+     col = "blue",
+     pch = 1,
+     lty = 1,
+     xlab = "Speed",
+     ylab = "Mixed Variance"
+)
+axis(1, at = all_x, labels = all_x)
+grid()
 
 
 
-
-#print(mixed_variance)
 
 #Now we got mixed variance of two sets versus threshold
 
-#We will now start Otsu's method
+#In letter b problem in Part B 
+
+#############
+#Part C
+#############
