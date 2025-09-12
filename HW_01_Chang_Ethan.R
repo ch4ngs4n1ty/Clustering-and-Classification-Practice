@@ -1,3 +1,4 @@
+
 #Part A
 
 N <- 10000 #10,000 Gaussian Random Values
@@ -111,23 +112,27 @@ for (i in seq_along(threshold)) {
     mixed_variance[i] = round(mv_nround * 10) / 10 #Round to nearest tenth and remove noise
 }
 
-range(all_speeds)
-all_x <- min(all_speeds):max(all_speeds)
+png("partB_plot.png", width = 1200, height = 600)  # width > height makes it wide
 
-plot(threshold, mixed_variance,
+print(range(mixed_variance))
+x <- threshold
+
+par(mfrow=c(1,1)) #1 row 1 column
+
+plot(x, mixed_variance,
      main = "Mixed Variance vs Threshold",
      type = "l",
      col = "blue",
      pch = 1,
      lty = 1,
      xlab = "Speed",
-     ylab = "Mixed Variance"
+     ylab = "Mixed Variance",
+     ylim = c(0, 20)
 )
-axis(1, at = all_x, labels = all_x)
+axis(1, at = x, labels = x)
 grid()
 
-
-
+dev.off()
 
 #Now we got mixed variance of two sets versus threshold
 
@@ -136,3 +141,55 @@ grid()
 #############
 #Part C
 #############
+
+#Possible threshold speed from low to high
+
+intent <- data_all$INTENT
+
+nonagg_index = intent %in% c(0, 1) #Non Aggressive Index
+agg_index = intent == 2 #Aggressive Index
+
+table(intent)
+speeds_nonagg <- all_speeds[nonagg_index]
+speeds_agg <- all_speeds[agg_index]
+
+false_alarms <- numeric(length(threshold)) #False Alarms
+missed_detections <- numeric(length(threshold)) #Missed Detections
+total_mistakes <- numeric(length(threshold)) #False Negatives
+
+for (i in seq_along(threshold)) {
+
+    t <- threshold[i] #Current threshold
+
+    a <- mean(speeds_nonagg > t)
+    b <- mean(speeds_agg <= t)
+    mistakes <- a + b
+
+    false_alarms[i] <- a
+    missed_detections[i] <- b
+    total_mistakes[i] <- mistakes
+
+}
+
+png("partC_plot.png", width = 1200, height = 600)  # width > height makes it wide
+
+x <- threshold
+ylim_range <- c(0, 1)
+
+plot(x, false_alarms,
+    type = "o",
+    col = "red",
+    lwd = 2, 
+    lty = 2,
+    pch = 15,
+    ylim = c(0, 1),
+    xlab = "Threshold Speed",
+    ylab = "Fraction",
+    main = "False Alarms and Missed Detections vs Threshold Speed",
+    xaxt = "n"
+)
+axis(1, at = x, labels = x)
+lines(x, missed_detections, type="o", col="blue", pch=2, lwd=2)     # triangles
+lines(x, total_mistakes,    type="o", col="magenta", pch=1, lwd=2)  # circles
+
+dev.off()
