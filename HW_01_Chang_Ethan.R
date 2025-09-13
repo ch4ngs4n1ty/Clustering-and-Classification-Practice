@@ -1,5 +1,6 @@
-
+#############
 #Part A
+#############
 
 N <- 10000 #10,000 Gaussian Random Values
 mu <- 0 #They all start with mu of 0
@@ -14,48 +15,46 @@ U <- rnorm(N, mu, sigma) #Sixth Vector
 
 distA <- sqrt(X^2)
 fracA <- mean(distA <= 1.0)
-print(fracA)
 
 distB <- sqrt(X^2 + Y^2)
 fracB <- mean(distB <= 1.0)
-print(fracB)
 
 distC <- sqrt(X^2 + Y^2 + Z^2)
 fracC <- mean(distC <= 1.0)
-print(fracC)
 
 disigma <- sqrt(X^2 + Y^2 + Z^2 + S^2)
 fracD <- mean(disigma <= 1.0)
-print(fracD)
 
 distE <- sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2)
 fracE <- mean(distE <= 1.0)
-print(fracE)
 
 distF <- sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2 + U^2)
 fracF <- mean(distF <= 1.0)
-print(fracF)
 
 dims <- 1:6
 fracs <- c(fracA, fracB, fracC, fracD, fracE, fracF)
 
-#print(data.frame(dimension = dims, fraction = fracs))
+png("partA_plot.png", width = 1200, height = 600)  
 
 plot(dims, fracs,
-main = "Gaussian Vectors in N Dimensions",
+main = "Gaussian Vectors in N Dimensions", #Title on top of the graph
 type = "o",
 pch = 1,
 lty = 2,
-ylim = c(0,1), # y axis between 0 and 1 (fractions)
+ylim = c(0,1), 
+xlim = c(0,7), 
 xlab = "Number of elements (dimension)",
-ylab = "Fraction within 1 sigma dev"
+ylab = "Fraction within 1 sigma dev",
+xaxs = "i" #To make X-Axis start as 0
 )
+
+dev.off()
 
 #Graph shows that as dimension increase, the fraction of points withing 1 sigma decreases.
 
-#############################
+#############
 #Part B 
-#############################
+#############
 
 #TRAFFIC_STATIONS_2251 -> TrafficStation_2251_0# -> Data_0#.csv
 
@@ -71,17 +70,7 @@ dfs <- lapply(csvs, read.csv)
 
 data_all <- do.call(rbind, dfs)
 
-# show the column names
-names(data_all)
-
-# see first few rows
-head(data_all)
-
-# show structure (types of each column)
-str(data_all)
-
 all_speeds <- round(data_all$SPEED) #Quantitize speed data to nearest one mile per hour
-#intents <- data_all$INTENT
 
 threshold <- 45:85 #Thresholds from 45 to 85 miles per hour
 
@@ -114,7 +103,6 @@ for (i in seq_along(threshold)) {
 
 png("partB_plot.png", width = 1200, height = 600)  # width > height makes it wide
 
-print(range(mixed_variance))
 x <- threshold
 
 par(mfrow=c(1,1)) #1 row 1 column
@@ -125,12 +113,18 @@ plot(x, mixed_variance,
      col = "blue",
      pch = 1,
      lty = 1,
+     lwd = 2,
      xlab = "Speed",
      ylab = "Mixed Variance",
-     ylim = c(0, 20)
+     ylim = c(0, 20),
+     xaxs = "i", #To make X-Axis start as 0
 )
 axis(1, at = x, labels = x)
-grid()
+axis(2)
+
+# v = x (Places vertical grid lines with x values)
+abline(v = x, col = "lightgrey", lty = 1, lwd = 2)   # vertical grid
+abline(h = axTicks(2), col = "lightgrey", lty = 1, lwd = 2)  # horizontal grid
 
 dev.off()
 
@@ -149,7 +143,6 @@ intent <- data_all$INTENT
 nonagg_index = intent %in% c(0, 1) #Non Aggressive Index
 agg_index = intent == 2 #Aggressive Index
 
-table(intent)
 speeds_nonagg <- all_speeds[nonagg_index]
 speeds_agg <- all_speeds[agg_index]
 
@@ -186,7 +179,8 @@ plot(x, false_alarms,
     xlab = "Threshold Speed",
     ylab = "Fraction",
     main = "False Alarms and Missed Detections vs Threshold Speed",
-    xaxt = "n"
+    xaxt = "n",
+    xaxs = "i" #To make X-Axis start as 0
 )
 axis(1, at = x, labels = x)
 lines(x, missed_detections, type="o", col="blue", pch=2, lwd=2)     # triangles
