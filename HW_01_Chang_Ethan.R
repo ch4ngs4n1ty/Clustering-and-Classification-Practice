@@ -1,5 +1,5 @@
 #############
-#Part A
+#Part A - Experimenting with Gaussian Random Numbers
 #############
 
 N <- 10000 #10,000 Gaussian Random Values
@@ -13,42 +13,49 @@ S <- rnorm(N, mu, sigma) #Fourth Vector
 T <- rnorm(N, mu, sigma) #Fifth Vector
 U <- rnorm(N, mu, sigma) #Sixth Vector
 
-distA <- sqrt(X^2)
+distA <- sqrt(X^2) #Distance in 1D: dist = sqrt(X^2)
 fracA <- mean(distA <= 1.0)
 
-distB <- sqrt(X^2 + Y^2)
+distB <- sqrt(X^2 + Y^2) #Distance in 2D: dist = sqrt(X^2 + Y^2)
 fracB <- mean(distB <= 1.0)
 
-distC <- sqrt(X^2 + Y^2 + Z^2)
+distC <- sqrt(X^2 + Y^2 + Z^2) #Distance in 3D: dist = sqrt(X^2 + Y^2 + Z^2)
 fracC <- mean(distC <= 1.0)
 
-disigma <- sqrt(X^2 + Y^2 + Z^2 + S^2)
+disigma <- sqrt(X^2 + Y^2 + Z^2 + S^2) #Distance in 4D: dist = sqrt(X^2 + Y^2 + Z^2 + S^2)
 fracD <- mean(disigma <= 1.0)
 
-distE <- sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2)
+distE <- sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2) #Distance in 5D: dist = sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2)
 fracE <- mean(distE <= 1.0)
 
-distF <- sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2 + U^2)
+distF <- sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2 + U^2) #Distance in 6D: dist = sqrt(X^2 + Y^2 + Z^2 + S^2 + T^2 + U^2)
 fracF <- mean(distF <= 1.0)
 
-dims <- 1:6
-fracs <- c(fracA, fracB, fracC, fracD, fracE, fracF)
+dims <- 1:6 #Dimensions from 1 to 6 X-Axis
+fracs <- c(fracA, fracB, fracC, fracD, fracE, fracF) #Data (Fraction of data in 1 std of origin) For Y-Axis 
 
-png("partA_plot.png", width = 1200, height = 600)  
+png("partA_plot.png", width = 1200, height = 600) #Generates png file of Part A graph  
+
+print(fracA)
+print(fracB)
+print(fracC)
+print(fracD)
+print(fracE)
+print(fracF)    
 
 plot(dims, fracs,
-main = "Gaussian Vectors in N Dimensions", #Title on top of the graph
-type = "o",
-pch = 1,
-lty = 2,
-ylim = c(0,1), 
-xlim = c(0,7), 
+main = "Gaussian Random Numbers in N Dimensions", #Title on top of the graph
+type = "o", #Displays points and lines in graph
+pch = 1, #Plotting character, representing symbols. Ex: 1 = circle, (There are 0 to 25 options)
+lty = 2, #Line type like blank, solid, dashed, dotted etc
+ylim = c(0,1),  #Y-Axis limits
+xlim = c(0,7),  #X-Axis limits
 xlab = "Number of elements (dimension)",
 ylab = "Fraction within 1 sigma dev",
 xaxs = "i" #To make X-Axis start as 0
 )
 
-dev.off()
+dev.off() #Purpose is to tell script to stop writing file and close it
 
 #Graph shows that as dimension increase, the fraction of points withing 1 sigma decreases.
 
@@ -58,17 +65,13 @@ dev.off()
 
 #TRAFFIC_STATIONS_2251 -> TrafficStation_2251_0# -> Data_0#.csv
 
-main_folder <- "/Users/ch4ngs4n1ty/CSCI 420/HW 1/TRAFFIC_STATIONS_2251"
+main_folder <- "TRAFFIC_STATIONS_2251"
 
-idx <- sprintf("%02d", 1:32)  
-
-subs <- file.path(main_folder, paste0("TrafficStation_2251_", idx))
-
-csvs <- file.path(subs, paste0("Data_", idx, ".csv"))
+csvs <- list.files(main_folder, pattern = "Data_.*\\.csv", recursive = TRUE, full.names = TRUE)
 
 dfs <- lapply(csvs, read.csv)
 
-data_all <- do.call(rbind, dfs)
+data_all <- do.call(rbind, dfs) #Combine all data frames into one data frame
 
 all_speeds <- round(data_all$SPEED) #Quantitize speed data to nearest one mile per hour
 
@@ -185,5 +188,27 @@ plot(x, false_alarms,
 axis(1, at = x, labels = x)
 lines(x, missed_detections, type="o", col="blue", pch=2, lwd=2)     # triangles
 lines(x, total_mistakes,    type="o", col="magenta", pch=1, lwd=2)  # circles
+
+dev.off()
+
+#############
+#Write Up For Question 2
+#############
+
+#According to research with table() function, it can automatically sort them in ascending numeric order or alphabetical order so everything in graph looks organized.
+tab <- table(intent, all_speeds) 
+
+png("writeup2_barplot.png", width = 1200, height = 600)  # width > height makes it wide
+
+barplot(tab, 
+        beside = TRUE,
+        col = c("lightgrey", "darkgrey", "black"),
+        xlab = "Speed (mph)",
+        ylab = "Count",
+        main = "Histogram of Vehicle Speeds by Driver Intent",
+        xaxs = "i" #To make X-Axis start as 0
+)
+
+legend("topright", legend = c("0", "1", "2"), fill = c("lightgrey", "darkgrey", "black"))
 
 dev.off()
