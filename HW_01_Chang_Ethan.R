@@ -45,7 +45,8 @@ ylim = c(0,1),  #Y-Axis limits
 xlim = c(0,7),  #X-Axis limits
 xlab = "Number of elements (dimension)",
 ylab = "Fraction within 1 sigma dev",
-xaxs = "i" #To make X-Axis start as 0
+xaxs = "i", #To make X-Axis start as 0
+yaxs = "i" #To make Y-Axis start as 0
 )
 
 dev.off() #Purpose is to tell script to stop writing file and close it
@@ -114,6 +115,7 @@ plot(x, mixed_variance,
      ylab = "Mixed Variance",
      ylim = c(0, 20),
      xaxs = "i", #To make X-Axis start as 0
+     yaxs = "i", #To make Y-Axis start as 0
 )
 axis(1, at = x, labels = x)
 axis(2)
@@ -125,10 +127,8 @@ abline(h = axTicks(2), col = "lightgrey", lty = 1, lwd = 2)  # horizontal grid
 dev.off()
 
 #############
-#Part C
+#Part C - Computing Fraction of False Alarms, Fraction of Misses, and Fraction of Total Mistakes
 #############
-
-#Possible threshold speed from low to high
 
 intent <- data_all$INTENT
 
@@ -175,9 +175,17 @@ plot(x, false_alarms,
     xaxs = "i", #To make X-Axis start as 0
     yaxs = "i" #To make Y-Axis start as 0
 )
+
 axis(1, at = x, labels = x)
 lines(x, missed_detections, type="o", col="blue", pch=2, lwd=2)     # triangles
 lines(x, total_mistakes,    type="o", col="magenta", pch=1, lwd=2)  # circles
+
+legend("topright", legend = c("False Alarms", "Missed Detections", "Total Mistakes"),
+       col = c("red", "blue", "magenta"),
+       pch = c(15, 2, 1),
+       lty = c(2, 1, 1),
+       lwd = 2
+)
 
 dev.off()
 
