@@ -43,8 +43,8 @@ pch = 1, #Plotting character, representing symbols. Ex: 1 = circle, (There are 0
 lty = 2, #Line type like blank, solid, dashed, dotted etc
 ylim = c(0,1),  #Y-Axis limits
 xlim = c(0,7),  #X-Axis limits
-xlab = "Number of elements (dimension)",
-ylab = "Fraction within 1 sigma dev",
+xlab = "Number of Dimensions (N)", #X-Axis label
+ylab = "Fraction Within 1 Sigma", #Y-Axis label
 xaxs = "i", #To make X-Axis start as 0
 yaxs = "i" #To make Y-Axis start as 0
 )
@@ -59,11 +59,13 @@ dev.off() #Purpose is to tell script to stop writing file and close it
 
 #TRAFFIC_STATIONS_2251 -> TrafficStation_2251_0# -> Data_0#.csv
 
-main_folder <- "TRAFFIC_STATIONS_2251"
+main_folder <- "TRAFFIC_STATIONS_2251" #Initial main folder containing subfolders with csv files
 
+#R function list.files() lists all files in a directory.
+#Finds files that include subtext of Data_##.csv and use recursive to look all of the subfolders
 csvs <- list.files(main_folder, pattern = "Data_.*\\.csv", recursive = TRUE, full.names = TRUE)
 
-dfs <- lapply(csvs, read.csv)
+dfs <- lapply(csvs, read.csv) #lapply() applies function for each element of vectors and returns whole list of subfolders
 
 data_all <- do.call(rbind, dfs) #Combine all data frames into one data frame
 
@@ -73,7 +75,7 @@ threshold <- 45:85 #Thresholds from 45 to 85 miles per hour
 
 mixed_variance <- numeric(length(threshold)) #Purpose of this is to create mixed variance vectors of all 45 - 85 thresholds
 
-for (i in seq_along(threshold)) {
+for (i in seq_along(threshold)) { #Similar to for loop in Python
 
     t <- threshold[i] #Current threshold
 
@@ -98,27 +100,24 @@ for (i in seq_along(threshold)) {
     mixed_variance[i] = round(mv_nround * 10) / 10 #Round to nearest tenth and remove noise
 }
 
-png("partB_plot.png", width = 1200, height = 600)  # width > height makes it wide
+png("partB_plot.png", width = 1200, height = 600)  #Creates Part B plot image file
 
 x <- threshold
 
-par(mfrow=c(1,1)) #1 row 1 column
-
 plot(x, mixed_variance,
-     main = "Mixed Variance vs Threshold",
-     type = "l",
+     main = "Mixed Variance vs Speed",
+     type = "l", #Line that connect points without showcasing points
      col = "blue",
-     pch = 1,
-     lty = 1,
+     lty = 1, #Solid line
      lwd = 2,
      xlab = "Speed",
      ylab = "Mixed Variance",
+     xlim = c(45, 85),
      ylim = c(0, 20),
      xaxs = "i", #To make X-Axis start as 0
      yaxs = "i", #To make Y-Axis start as 0
 )
-axis(1, at = x, labels = x)
-axis(2)
+axis(1, at = x, labels = x) #Custom x-axis that shocases all of x-axis points
 
 # v = x (Places vertical grid lines with x values)
 abline(v = x, col = "lightgrey", lty = 1, lwd = 2)   # vertical grid
@@ -130,13 +129,13 @@ dev.off()
 #Part C - Computing Fraction of False Alarms, Fraction of Misses, and Fraction of Total Mistakes
 #############
 
-intent <- data_all$INTENT
+intent <- data_all$INTENT #Pulling Intent data from Intent column
 
-nonagg_index = intent %in% c(0, 1) #Non Aggressive Index
-agg_index = intent == 2 #Aggressive Index
+nonagg_index = intent %in% c(0, 1) #Non Aggressive Index. True for rows where intent is 0 or 1
+agg_index = intent == 2 #Aggressive Index. True for rows where intent is 2
 
-speeds_nonagg <- all_speeds[nonagg_index]
-speeds_agg <- all_speeds[agg_index]
+speeds_nonagg <- all_speeds[nonagg_index] #Creates new vector of non-aggresive speeds
+speeds_agg <- all_speeds[agg_index] #Creates new vector of aggresive speeds
 
 false_alarms <- numeric(length(threshold)) #False Alarms
 missed_detections <- numeric(length(threshold)) #Missed Detections
@@ -146,9 +145,9 @@ for (i in seq_along(threshold)) {
 
     t <- threshold[i] #Current threshold
 
-    a <- mean(speeds_nonagg > t)
-    b <- mean(speeds_agg <= t)
-    mistakes <- a + b
+    a <- mean(speeds_nonagg > t) #False Alarms
+    b <- mean(speeds_agg <= t) #Missed Detections
+    mistakes <- a + b #Total Mistakes
 
     false_alarms[i] <- a
     missed_detections[i] <- b
@@ -156,30 +155,33 @@ for (i in seq_along(threshold)) {
 
 }
 
-png("partC_plot.png", width = 1200, height = 600)  # width > height makes it wide
+png("partC_plot.png", width = 1200, height = 600)  # Part C plot image file
 
 x <- threshold
-ylim_range <- c(0, 1)
 
 plot(x, false_alarms,
     type = "o",
     col = "red",
-    lwd = 2, 
-    lty = 2,
-    pch = 15,
+    lwd = 2, #Line Width Size
+    lty = 2, #Dashed Line
+    pch = 15, #Squares
     ylim = c(0, 1),
-    xlab = "Threshold Speed",
+    xlab = "Speed",
     ylab = "Fraction",
-    main = "False Alarms and Missed Detections vs Threshold Speed",
+    main = "False Alarms and Missed Detections vs Speed",
     xaxt = "n",
     xaxs = "i", #To make X-Axis start as 0
     yaxs = "i" #To make Y-Axis start as 0
 )
 
 axis(1, at = x, labels = x)
+
+#Adds lines of missed detections into graph
 lines(x, missed_detections, type="o", col="blue", pch=2, lwd=2)     # triangles
+#Adds lines of total mistakes into graph
 lines(x, total_mistakes,    type="o", col="magenta", pch=1, lwd=2)  # circles
 
+#Adds legend in top right corner allowing us to showcase what each color and symbol represents
 legend("topright", legend = c("False Alarms", "Missed Detections", "Total Mistakes"),
        col = c("red", "blue", "magenta"),
        pch = c(15, 2, 1),
@@ -196,12 +198,12 @@ dev.off()
 #According to research with table() function, it can automatically sort them in ascending numeric order or alphabetical order so everything in graph looks organized.
 tab <- table(intent, all_speeds) 
 
-png("writeup2_barplot.png", width = 1200, height = 600)  # width > height makes it wide
+png("writeup2_barplot.png", width = 1200, height = 600)  # Write Up Question 2 bar plot image file
 
 barplot(tab, 
         beside = TRUE,
-        col = c("lightgrey", "darkgrey", "black"),
-        xlab = "Speed (mph)",
+        col = c("lightgrey", "darkgrey", "black"), #Light grey = 0, Dark grey = 1, Black = 2
+        xlab = "Speed",
         ylab = "Count",
         main = "Histogram of Vehicle Speeds by Driver Intent",
         xaxs = "i" #To make X-Axis start as 0
