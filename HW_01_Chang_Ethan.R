@@ -34,14 +34,7 @@ fracF <- mean(distF <= 1.0)
 dims <- 1:6 #Dimensions from 1 to 6 X-Axis
 fracs <- c(fracA, fracB, fracC, fracD, fracE, fracF) #Data (Fraction of data in 1 std of origin) For Y-Axis 
 
-png("partA_plot.png", width = 1200, height = 600) #Generates png file of Part A graph  
-
-print(fracA)
-print(fracB)
-print(fracC)
-print(fracD)
-print(fracE)
-print(fracF)    
+png("partA_plot.png", width = 1200, height = 600) #Generates png file of Part A graph   
 
 plot(dims, fracs,
 main = "Gaussian Random Numbers in N Dimensions", #Title on top of the graph
@@ -60,7 +53,7 @@ dev.off() #Purpose is to tell script to stop writing file and close it
 #Graph shows that as dimension increase, the fraction of points withing 1 sigma decreases.
 
 #############
-#Part B 
+#Part B - Clustering By Computing Otsu's Method
 #############
 
 #TRAFFIC_STATIONS_2251 -> TrafficStation_2251_0# -> Data_0#.csv
@@ -131,10 +124,6 @@ abline(h = axTicks(2), col = "lightgrey", lty = 1, lwd = 2)  # horizontal grid
 
 dev.off()
 
-#Now we got mixed variance of two sets versus threshold
-
-#In letter b problem in Part B 
-
 #############
 #Part C
 #############
@@ -183,7 +172,8 @@ plot(x, false_alarms,
     ylab = "Fraction",
     main = "False Alarms and Missed Detections vs Threshold Speed",
     xaxt = "n",
-    xaxs = "i" #To make X-Axis start as 0
+    xaxs = "i", #To make X-Axis start as 0
+    yaxs = "i" #To make Y-Axis start as 0
 )
 axis(1, at = x, labels = x)
 lines(x, missed_detections, type="o", col="blue", pch=2, lwd=2)     # triangles
